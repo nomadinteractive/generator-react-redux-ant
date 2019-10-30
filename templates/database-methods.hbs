@@ -1,0 +1,59 @@
+const get{{ pascalCase (getPluralName yml) }} = () => new Promise(async (resolve, reject) => {
+	models.{{ pascalCase (getPluralName yml) }}.findAll()
+		.then(({{ snakeCase (getPluralName yml) }}) => { // eslint-disable-line camelcase
+			resolve({{ snakeCase (getPluralName yml) }})
+		})
+		.catch(err => reject(err))
+})
+
+const get{{ pascalCase (getSingularName yml) }} = {{ getPKey yml }} => new Promise(async (resolve, reject) => {
+	models.{{ pascalCase (getPluralName yml) }}.findByPk({{ getPKey yml }})
+		.then(({{ snakeCase (getSingularName yml) }}) => { // eslint-disable-line camelcase
+			resolve({{ snakeCase (getSingularName yml) }})
+		})
+		.catch(err => reject(err))
+})
+
+const create{{ pascalCase (getSingularName yml) }} = values => new Promise(async (resolve, reject) => {
+	const objToInsert = Object.assign({}, values)
+
+	models.{{ pascalCase (getPluralName yml) }}.create(objToInsert)
+		.then((result) => {
+			resolve(result)
+		})
+		.catch((err) => {
+			reject(err)
+		})
+})
+
+const update{{ pascalCase (getSingularName yml) }} = ({{ getPKey yml }}, values) => new Promise(async (resolve, reject) => {
+	const objToUpdate = Object.assign({}, values)
+
+	models.{{ pascalCase (getPluralName yml) }}.findByPk({{ getPKey yml }})
+		.then(({{ snakeCase (getSingularName yml) }}) => { // eslint-disable-line camelcase
+		if (!{{ snakeCase (getSingularName yml) }}) return reject(new Error('{{titleCase (getSingularName yml)}} Not found')) // eslint-disable-line camelcase
+			{{ snakeCase (getSingularName yml) }}.update(objToUpdate)
+				.then((result) => {
+					resolve(result)
+				})
+				.catch((err) => {
+					reject(err)
+				})
+		})
+})
+
+const delete{{ pascalCase (getSingularName yml) }} = {{ getPKey yml }} => new Promise(async (resolve, reject) => {
+	models.{{ pascalCase (getPluralName yml) }}.findByPk({{ getPKey yml }})
+		.then(({{ snakeCase (getSingularName yml) }}) => { // eslint-disable-line camelcase
+			if (!{{ snakeCase (getSingularName yml) }}) return reject(new Error('{{titleCase (getSingularName yml)}} Not found')) // eslint-disable-line camelcase
+			{{ snakeCase (getSingularName yml) }}.destroy()
+				.then((result) => {
+					resolve(result)
+				})
+				.catch((err) => {
+					reject(err)
+				})
+		})
+})
+
+$1
