@@ -10,29 +10,30 @@ const nodeModuleDir = __dirname
 const getGeneratorsConfig = (configFilePath) => {
 	const configFileStr = fs.readFileSync(path.resolve(configFilePath), 'utf8')
 	const config = JSON.parse(configFileStr)
-	return config
+	if (typeof config['react-redux-ant'] !== 'object') return
+	return config['react-redux-ant']
 }
 
 const validateConfig = (config) => {
-	if (typeof config['react-redux-ant'] !== 'object') return false
-	if (typeof config['react-redux-ant'].actions_directory !== 'string') return false
-	if (typeof config['react-redux-ant'].reducers_directory !== 'string') return false
-	if (typeof config['react-redux-ant'].screens_directory !== 'string') return false
-	if (typeof config['react-redux-ant'].actions_index_file !== 'string') return false
-	if (typeof config['react-redux-ant'].actions_index_new_imports_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].action_types_file !== 'string') return false
-	if (typeof config['react-redux-ant'].action_types_new_constants_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].api_file !== 'string') return false
-	if (typeof config['react-redux-ant'].api_new_methods_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].api_methods_exports_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].reducers_index_file !== 'string') return false
-	if (typeof config['react-redux-ant'].reducers_import_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].reducers_export_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].navigation_file !== 'string') return false
-	if (typeof config['react-redux-ant'].navigation_links_prepend_pattern !== 'string') return false
-	if (typeof config['react-redux-ant'].routes_file !== 'string') return false
-	if (typeof config['react-redux-ant'].routes_prepend_patterns_screen_imports !== 'string') return false
-	if (typeof config['react-redux-ant'].routes_prepend_patterns_screen_routes !== 'string') return false
+	if (!config) return false
+	if (typeof config.actions_directory !== 'string') return 1
+	if (typeof config.reducers_directory !== 'string') return 2
+	if (typeof config.screens_directory !== 'string') return 3
+	if (typeof config.actions_index_file !== 'string') return 4
+	if (typeof config.actions_index_new_imports_prepend_pattern !== 'string') return 5
+	if (typeof config.action_types_file !== 'string') return 6
+	if (typeof config.action_types_new_constants_prepend_pattern !== 'string') return 7
+	if (typeof config.api_file !== 'string') return 8
+	if (typeof config.api_new_methods_prepend_pattern !== 'string') return 9
+	if (typeof config.api_methods_exports_prepend_pattern !== 'string') return 10
+	if (typeof config.reducers_index_file !== 'string') return 11
+	if (typeof config.reducers_import_prepend_pattern !== 'string') return 12
+	if (typeof config.reducers_export_prepend_pattern !== 'string') return 13
+	if (typeof config.navigation_file !== 'string') return 14
+	if (typeof config.navigation_links_prepend_pattern !== 'string') return 15
+	if (typeof config.routes_file !== 'string') return 16
+	if (typeof config.routes_screen_imports_prepend_pattern !== 'string') return 17
+	if (typeof config.routes_screen_routes_prepend_pattern !== 'string') return 18
 	return true
 }
 
@@ -48,14 +49,6 @@ const getPluralName = (ymlFile) => {
 
 const getSingularName = (ymlFile) => {
 	return getYmlField(ymlFile, 'name').singular
-}
-
-const getEndpointPrefix = (ymlFile) => {
-	return getYmlField(ymlFile, 'endpointPrefix')
-}
-
-const getAuthRequired = (ymlFile) => {
-	return getYmlField(ymlFile, 'authRequired')
 }
 
 const getPKey = (ymlFile) => {
@@ -89,8 +82,6 @@ const getFields = (ymlFile) => {
 			}
 			if (val.indexOf('#') !== -1) { // pkey
 				newFieldScheme.primaryKey = true
-				newFieldScheme.autoIncrement = true
-				newFieldScheme.allowNull = false
 				newFieldScheme.required = true
 				val = val.replace(/\#/g, '')
 			}
@@ -111,6 +102,13 @@ const getFields = (ymlFile) => {
 	return fields
 }
 
+const getFieldsExceptPKey = (ymlFile) => {
+	const fields = getFields(ymlFile)
+	const pKey = getPKey(ymlFile)
+	delete fields[pKey]
+	return fields
+}
+
 const getRequiredFields = (ymlFile) => {
 	const fields = getFields(ymlFile)
 	const pKey = getPKey(ymlFile)
@@ -125,44 +123,11 @@ const getRequiredFields = (ymlFile) => {
 	return fieldsToReturn
 }
 
-const getRequiredFieldsExceptPkey = (ymlFile) => {
+const getRequiredFieldsExceptPKey = (ymlFile) => {
 	const fields = getRequiredFields(ymlFile)
 	const pKey = getPKey(ymlFile)
 	delete fields[pKey]
 	return fields
-}
-
-const getSequalizeType = (type) => {
-	switch (type.toLowerCase()) {
-		case 'integer':
-		case 'int':
-		case 'number':
-		case 'num':
-			return 'DataTypes.INTEGER'
-			break
-		case 'timestamp': 
-		case 'datetime': 
-			return 'DataTypes.DATE'
-			break
-		case 'bool': 
-		case 'boolean': 
-			return 'DataTypes.BOOLEAN'
-			break
-		case 'enum': 
-			return 'DataTypes.ENUM'
-			break
-		case 'date': 
-		case 'dateonly': 
-		case 'date-only': 
-			return 'DataTypes.DATEONLY'
-			break
-		case 'text':
-			return 'DataTypes.TEXT'
-		case 'string':
-		case 'varchar':
-		default:
-			return 'DataTypes.STRING'
-	}
 }
 
 const getPatternRegex = (str) => {
@@ -170,8 +135,9 @@ const getPatternRegex = (str) => {
 }
 
 const config = getGeneratorsConfig(projectDirGeneratorConfigFilePath)
-if (!validateConfig(config)) {
-	console.log("Generator configuration file (.nomad-generators-config) is not defined or not valid!")
+const validationResult = validateConfig(config)
+if (validationResult !== true) {
+	console.log("Generator configuration file (.nomad-generators-config) is not defined or not valid! (" + validationResult + ")")
 	process.exit(-1)
 }
 
@@ -186,42 +152,42 @@ module.exports = (plop) => {
 	// Custom Helpers
 	plop.addHelper('getPluralName', getPluralName)
 	plop.addHelper('getSingularName', getSingularName)
-	plop.addHelper('getEndpointPrefix', getEndpointPrefix)
 	plop.addHelper('getPKey', getPKey)
 	plop.addHelper('getFields', getFields)
+	plop.addHelper('getFieldsExceptPKey', getFieldsExceptPKey)
 	plop.addHelper('getRequiredFields', getRequiredFields)
-	plop.addHelper('getRequiredFieldsExceptPkey', getRequiredFieldsExceptPkey)
-	plop.addHelper('getSequalizeType', getSequalizeType)
+	plop.addHelper('getRequiredFieldsExceptPKey', getRequiredFieldsExceptPKey)
+	plop.addHelper('curly', (object, open) => (open ? '{' : '}'))
 
 	const previewAction = (answers) => {
-		const tpl = fs.readFileSync(path.resolve('templates/validator.hbs'), 'utf8')
+		const tpl = fs.readFileSync(path.resolve('templates/screen-listing.hbs'), 'utf8')
 		const renderedTempalte = plop.renderString(tpl, answers)
 		console.log('====> RenderedTempalte\n\n', renderedTempalte)
 	}
 
 	// config variables to be used in the generator configuration object below
-	const modelsDirectoryPath = path.resolve(config.sequalize.models_path)
-	const controllersDirectoryPath = path.resolve(config.mens.controllers_directory)
-	const validatorsDirectoryPath = path.resolve(config.mens.validators_directory)
-	const databaseFilePath = path.resolve(config.mens.database_file)
-	const databaseFileNewMethodsPrependPattern = config.mens.database_file_new_methods_prepend_pattern
-	const databaseFileExportsPrependPattern = config.mens.database_file_exports_prepend_pattern
-
-	const docsTagsFilePath = path.resolve(config.mens.docs_tags_file)
-	const docsTagsFilePrependPattern = config.mens.docs_tags_file_prepend_pattern
-	const docsParametersFilePath = path.resolve(config.mens.docs_parameters_file)
-	const docsParametersFilePrependPattern = config.mens.docs_parameters_file_prepend_pattern
-	const routesFilePath = path.resolve(config.mens.routes_file)
-	const routesFileControllersImportsPrependPattern = config.mens.routes_prepend_patterns.controllers_imports
-	const routesFileValidatorImportsPrependPattern = config.mens.routes_prepend_patterns.validator_imports
-	const routesFileControllersInitPrependPattern = config.mens.routes_prepend_patterns.controllers_init
-	const routesFileValidatorInitPrependPattern = config.mens.routes_prepend_patterns.validator_init
-	const routesFileEndpointsPrependPattern = config.mens.routes_prepend_patterns.endpoints
-
+	const actionsDirectoryPath = path.resolve(config.actions_directory)
+	const reducersDirectoryPath = path.resolve(config.reducers_directory)
+	const screensDirectoryPath = path.resolve(config.screens_directory)
+	const actionsIndexFilePath = path.resolve(config.actions_index_file)
+	const actionsIndexNewImportsPrependPattern = config.actions_index_new_imports_prepend_pattern
+	const actionTypesFilePath = path.resolve(config.action_types_file)
+	const actionsTypesNewConstantsPrependPattern = config.action_types_new_constants_prepend_pattern
+	const apiFilePath = path.resolve(config.api_file)
+	const apiNewMethodsPrependPattern = config.api_new_methods_prepend_pattern
+	const apiMethodExportsPrependPattern = config.api_methods_exports_prepend_pattern
+	const reducersIndexFilePath = path.resolve(config.reducers_index_file)
+	const reducersIndexImportPrependPattern = config.reducers_import_prepend_pattern
+	const reducersIndexExportPrependPattern = config.reducers_export_prepend_pattern
+	const navigationFilePath = path.resolve(config.navigation_file)
+	const navigationLinksPrependPattern = config.navigation_links_prepend_pattern
+	const routesFilePath = path.resolve(config.routes_file)
+	const routesScreenImportsPrependPattern = config.routes_screen_imports_prepend_pattern
+	const routesScreenRoutesPrependPattern = config.routes_screen_routes_prepend_pattern
 
 	// Plop generator configuration
     plop.setGenerator('crud', {
-		description: 'Create MENS API CRUD',
+		description: 'Create React Redux Ant App CRUD UI',
         prompts: [
 			{
 				type: 'input',
@@ -237,128 +203,108 @@ module.exports = (plop) => {
 			// previewAction,
 
 			// Generate actions file
-
+			{
+				type: 'add',
+				path: actionsDirectoryPath + '/{{ snakeCase (getPluralName yml) }}.js',
+				templateFile: 'templates/action.hbs',
+				force: true,
+			},
 
 			// Generate reducer file
+			{
+				type: 'add',
+				path: reducersDirectoryPath + '/{{ snakeCase (getPluralName yml) }}.js',
+				templateFile: 'templates/reducer.hbs',
+				force: true,
+			},
 
 
 			// Generate listing screen file
-
-
-			// Generate edit screen file
+			{
+				type: 'add',
+				path: screensDirectoryPath + '/{{ snakeCase (getPluralName yml) }}.js',
+				templateFile: 'templates/screen-listing.hbs',
+				force: true,
+			},
+			
+			
+			// // Generate edit screen file
+			{
+				type: 'add',
+				path: screensDirectoryPath + '/{{ snakeCase (getSingularName yml) }}_edit.js',
+				templateFile: 'templates/screen-edit.hbs',
+				force: true,
+			},
 
 
 			// Append actions import in actions/index.js
+			{
+				type: 'modify',
+				path: actionsIndexFilePath,
+				pattern: getPatternRegex(actionsIndexNewImportsPrependPattern),
+				template: "export * from './{{ snakeCase (getPluralName yml) }}'\n$1"
+			},
 
 
 			// Create & append action constants in constants/action_types.js
+			{
+				type: 'modify',
+				path: actionTypesFilePath,
+				pattern: getPatternRegex(actionsTypesNewConstantsPrependPattern),
+				templateFile: 'templates/action-types-constants.hbs'
+			},
 
 
 			// Create & append API methods in network-managers/api.js
-
+			{
+				type: 'modify',
+				path: apiFilePath,
+				pattern: getPatternRegex(apiNewMethodsPrependPattern),
+				templateFile: 'templates/api-methods.hbs'
+			},
+			{
+				type: 'modify',
+				path: apiFilePath,
+				pattern: getPatternRegex(apiMethodExportsPrependPattern),
+				templateFile: 'templates/api-exports.hbs'
+			},
 
 			// Append reducer import in reducer/index.js
-
+			{
+				type: 'modify',
+				path: reducersIndexFilePath,
+				pattern: getPatternRegex(reducersIndexImportPrependPattern),
+				template: "import { {{ pascalCase (getPluralName yml) }}Reducer } from './{{ snakeCase (getPluralName yml) }}'\n$1"
+			},
+			{
+				type: 'modify',
+				path: reducersIndexFilePath,
+				pattern: getPatternRegex(reducersIndexExportPrependPattern),
+				template: "\t{{ camelCase (getPluralName yml) }}: {{ pascalCase (getPluralName yml) }}Reducer,\n$1"
+			},
 
 			// Append navigation menu with new page links in screens/shared/header.js
-
+			{
+				type: 'modify',
+				path: navigationFilePath,
+				pattern: getPatternRegex(navigationLinksPrependPattern),
+				templateFile: 'templates/navigation-link.hbs'
+			},
 			
 			// Append new routes in router.js
+			{
+				type: 'modify',
+				path: routesFilePath,
+				pattern: getPatternRegex(routesScreenImportsPrependPattern),
+				templateFile: 'templates/routes-import.hbs'
+			},
+			{
+				type: 'modify',
+				path: routesFilePath,
+				pattern: getPatternRegex(routesScreenRoutesPrependPattern),
+				templateFile: 'templates/routes-route-tags.hbs'
+			},
 
-
-
-
-
-
-			// create api controller
-			// {
-			// 	type: 'add',
-			// 	path: controllersDirectoryPath + '/{{ snakeCase (getPluralName yml) }}.js',
-			// 	templateFile: 'templates/controller.hbs',
-			// 	force: true,
-			// },
-			
-			// // create validator
-			// {
-			// 	type: 'add',
-			// 	path: validatorsDirectoryPath + '/{{ snakeCase (getPluralName yml) }}.js',
-			// 	templateFile: 'templates/validator.hbs',
-			// 	force: true,
-			// },
-
-			// // create new database model
-			// {
-			// 	type: 'add',
-			// 	path: modelsDirectoryPath + '/{{ snakeCase (getPluralName yml) }}.js',
-			// 	templateFile: 'templates/model.hbs',
-			// 	force: true,
-			// },
-
-			// // add new database methods to database.js file
-			// {
-			// 	type: 'modify',
-			// 	path: databaseFilePath,
-			// 	pattern: getPatternRegex(databaseFileNewMethodsPrependPattern),
-			// 	templateFile: 'templates/database-methods.hbs'
-			// },
-			// // database.js exports
-			// {
-			// 	type: 'modify',
-			// 	path: databaseFilePath,
-			// 	pattern: getPatternRegex(databaseFileExportsPrependPattern),
-			// 	templateFile: 'templates/database-methods-exports.hbs'
-			// },
-
-			// // add new schema in docs/parameters file
-			// {
-			// 	type: 'modify',
-			// 	path: docsParametersFilePath,
-			// 	pattern: getPatternRegex(docsParametersFilePrependPattern),
-			// 	templateFile: 'templates/doc-parameters.hbs'
-			// },
-			// // add new schema in docs/tags file
-			// {
-			// 	type: 'modify',
-			// 	path: docsTagsFilePath,
-			// 	pattern: getPatternRegex(docsTagsFilePrependPattern),
-			// 	template: ' *   - name: {{ titleCase (getPluralName yml) }}\n$1'
-			// },
-
-			// // routes - import controller
-			// {
-			// 	type: 'modify',
-			// 	path: routesFilePath,
-			// 	pattern: getPatternRegex(routesFileControllersImportsPrependPattern),
-			// 	template: 'import {{ pascalCase (getPluralName yml) }}ControllerInit from \'./' + config.mens.controllers_directory + '/{{ snakeCase (getPluralName yml) }}\'\n$1'
-			// },
-			// // routes - import validator
-			// {
-			// 	type: 'modify',
-			// 	path: routesFilePath,
-			// 	pattern: getPatternRegex(routesFileValidatorImportsPrependPattern),
-			// 	template: 'import {{ pascalCase (getPluralName yml) }}ValidatorsInit from \'./' + config.mens.validators_directory + '/{{ snakeCase (getPluralName yml) }}\'\n$1'
-			// },
-			// // routes - import init controller
-			// {
-			// 	type: 'modify',
-			// 	path: routesFilePath,
-			// 	pattern: getPatternRegex(routesFileControllersInitPrependPattern),
-			// 	template: '\tconst {{ pascalCase (getPluralName yml) }}Controller = {{ pascalCase (getPluralName yml) }}ControllerInit(container)\n$1'
-			// },
-			// // routes - import init validator
-			// {
-			// 	type: 'modify',
-			// 	path: routesFilePath,
-			// 	pattern: getPatternRegex(routesFileValidatorInitPrependPattern),
-			// 	template: '\tconst {{ pascalCase (getPluralName yml) }}Validators = {{ pascalCase (getPluralName yml) }}ValidatorsInit(container)\n$1'
-			// },
-			// // routes - add endpoints
-			// {
-			// 	type: 'modify',
-			// 	path: routesFilePath,
-			// 	pattern: getPatternRegex(routesFileEndpointsPrependPattern),
-			// 	templateFile: 'templates/router-endpoints.hbs'
-			// },
 
 		]
     })

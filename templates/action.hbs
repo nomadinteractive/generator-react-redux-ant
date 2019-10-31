@@ -1,0 +1,178 @@
+import { notification } from 'antd'
+
+import {
+	GET_{{ upperCase (getPluralName yml) }}_LIST_SUCCESS,
+	GET_{{ upperCase (getPluralName yml) }}_LIST_FAILED,
+	GET_{{ upperCase (getSingularName yml) }}_SUCCESS,
+	GET_{{ upperCase (getSingularName yml) }}_FAILED,
+	CREATE_{{ upperCase (getSingularName yml) }}_SUCCESS,
+	CREATE_{{ upperCase (getSingularName yml) }}_FAILED,
+	UPDATE_{{ upperCase (getSingularName yml) }}_SUCCESS,
+	UPDATE_{{ upperCase (getSingularName yml) }}_FAILED,
+	DELETE_{{ upperCase (getSingularName yml) }}_SUCCESS,
+	DELETE_{{ upperCase (getSingularName yml) }}_FAILED,
+} from '../constants/action_types'
+import API from '../network-managers/api'
+
+// eslint-disable-next-line import/prefer-default-export
+export const get{{ pascalCase (getPluralName yml) }}List = dispatch => () => {
+	API.get{{ pascalCase (getPluralName yml) }}List()
+		.then(response => response.data)
+		.then((data) => {
+			// console.log('data', data)
+			get{{ pascalCase (getPluralName yml) }}ListSuccess(dispatch, data.{{ snakeCase (getPluralName yml) }})
+		})
+		.catch(() => {
+			// console.log(error)
+			get{{ pascalCase (getPluralName yml) }}ListFailed(dispatch)
+		})
+}
+
+const get{{ pascalCase (getPluralName yml) }}ListSuccess = (dispatch, {{ camelCase (getPluralName yml) }}) => {
+	dispatch({
+		type: GET_{{ upperCase (getSingularName yml) }}_LIST_SUCCESS,
+		{{ camelCase (getPluralName yml) }}
+	})
+}
+
+const get{{ pascalCase (getPluralName yml) }}ListFailed = (dispatch) => {
+	dispatch({
+		type: GET_{{ upperCase (getSingularName yml) }}_LIST_FAILED
+	})
+}
+
+// eslint-disable-next-line import/prefer-default-export
+export const clear{{ pascalCase (getSingularName yml) }} = dispatch => () => {
+	dispatch({
+		type: GET_{{ upperCase (getSingularName yml) }}_SUCCESS,
+		{{ camelCase (getSingularName yml) }}: {}
+	})
+}
+
+// eslint-disable-next-line import/prefer-default-export
+export const get{{ pascalCase (getSingularName yml) }} = dispatch => ({{ getPKey yml }}) => {
+	API.get{{ pascalCase (getSingularName yml) }}({{ getPKey yml }})
+		.then(response => response.data)
+		.then((data) => {
+			get{{ pascalCase (getSingularName yml) }}Success(dispatch, data.{{ snakeCase (getSingularName yml) }})
+		})
+		.catch(() => {
+			// console.log(error)
+			get{{ pascalCase (getSingularName yml) }}Failed(dispatch)
+		})
+}
+
+const get{{ pascalCase (getSingularName yml) }}Success = (dispatch, {{ camelCase (getSingularName yml) }}) => {
+	dispatch({
+		type: GET_{{ upperCase (getSingularName yml) }}_SUCCESS,
+		{{ camelCase (getSingularName yml) }}
+	})
+}
+
+const get{{ pascalCase (getSingularName yml) }}Failed = (dispatch) => {
+	dispatch({
+		type: GET_{{ upperCase (getSingularName yml) }}_FAILED
+	})
+}
+
+export const createOrUpdate{{ pascalCase (getSingularName yml) }} = dispatch => ({{ getPKey yml }}, values) => ({{ getPKey yml }}
+	? update{{ pascalCase (getSingularName yml) }}(dispatch)({{ getPKey yml }}, values)
+	: create{{ pascalCase (getSingularName yml) }}(dispatch)(values)
+)
+
+export const create{{ pascalCase (getSingularName yml) }} = dispatch => values => API.create{{ pascalCase (getSingularName yml) }}(values)
+	.then(response => response.data)
+	.then((/* data */) => {
+		// console.log('data', data)
+		create{{ pascalCase (getSingularName yml) }}Success(dispatch)
+	})
+	.catch(() => {
+		// console.log(error)
+		create{{ pascalCase (getSingularName yml) }}Failed(dispatch)
+	})
+
+const create{{ pascalCase (getSingularName yml) }}Success = (dispatch) => {
+	notification.success({
+		message: 'Done!',
+		description: '{{ titleCase (getSingularName yml) }} created successfully'
+	})
+
+	dispatch({
+		type: CREATE_{{ upperCase (getSingularName yml) }}_SUCCESS
+	})
+}
+
+const create{{ pascalCase (getSingularName yml) }}Failed = (dispatch) => {
+	notification.error({
+		message: 'Error!',
+		description: '{{ titleCase (getSingularName yml) }} create failed!'
+	})
+
+	dispatch({
+		type: CREATE_{{ upperCase (getSingularName yml) }}_FAILED
+	})
+}
+
+export const update{{ pascalCase (getSingularName yml) }} = dispatch => ({{ getPKey yml }}, values) => API.update{{ pascalCase (getSingularName yml) }}({{ getPKey yml }}, values)
+	.then(response => response.data)
+	.then((/* data */) => {
+		// console.log('data', data)
+		update{{ pascalCase (getSingularName yml) }}Success(dispatch)
+	})
+	.catch(() => {
+		update{{ pascalCase (getSingularName yml) }}Failed(dispatch)
+	})
+
+const update{{ pascalCase (getSingularName yml) }}Success = (dispatch) => {
+	notification.success({
+		message: 'Done!',
+		description: '{{ titleCase (getSingularName yml) }} updated successfully'
+	})
+
+	dispatch({
+		type: UPDATE_{{ upperCase (getSingularName yml) }}_SUCCESS
+	})
+}
+
+const update{{ pascalCase (getSingularName yml) }}Failed = (dispatch) => {
+	notification.error({
+		message: 'Error!',
+		description: '{{ titleCase (getSingularName yml) }} update failed!'
+	})
+
+	dispatch({
+		type: UPDATE_{{ upperCase (getSingularName yml) }}_FAILED
+	})
+}
+
+export const delete{{ pascalCase (getSingularName yml) }} = dispatch => {{ getPKey yml }} => API.delete{{ pascalCase (getSingularName yml) }}({{ getPKey yml }})
+	.then(response => response.data)
+	.then((/* data */) => {
+		// console.log('data', data)
+		delete{{ pascalCase (getSingularName yml) }}Success(dispatch)
+	})
+	.catch(() => {
+		delete{{ pascalCase (getSingularName yml) }}Failed(dispatch)
+	})
+
+const delete{{ pascalCase (getSingularName yml) }}Success = (dispatch) => {
+	notification.success({
+		message: 'Done!',
+		description: '{{ titleCase (getSingularName yml) }} deleted successfully'
+	})
+
+	dispatch({
+		type: DELETE_{{ upperCase (getSingularName yml) }}_SUCCESS
+	})
+}
+
+const delete{{ pascalCase (getSingularName yml) }}Failed = (dispatch) => {
+	notification.error({
+		message: 'Error!',
+		description: '{{ titleCase (getSingularName yml) }} delete failed!'
+	})
+
+	dispatch({
+		type: DELETE_{{ upperCase (getSingularName yml) }}_FAILED
+	})
+}

@@ -1,0 +1,155 @@
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import { Formik } from 'formik'
+import {
+	PageHeader,
+	Button,
+} from 'antd'
+import {
+	Form,
+	Input,
+} from '@jbuschke/formik-antd'
+import * as Yup from 'yup'
+
+import {
+	get{{ pascalCase (getSingularName yml) }},
+	clear{{ pascalCase (getSingularName yml) }},
+	createOrUpdate{{ pascalCase (getSingularName yml) }}
+} from '../actions'
+import PageLoading from './shared/page_loading'
+import PageContent from './shared/page_content'
+
+const schema = Yup.object().shape({
+	{{#each (getRequiredFieldsExceptPKey yml)}}
+	{{ @key }}: Yup.string()
+		.required('{{ titleCase @key }} field is required'),
+	{{/each}}
+})
+
+class {{ pascalCase (getSingularName yml) }}Edit extends Component {
+	componentDidMount() {
+		const {
+			get{{ pascalCase (getSingularName yml) }}Action,
+			clear{{ pascalCase (getSingularName yml) }}Action
+		} = this.props
+
+		const {{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }} = this.get{{ pascalCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}()
+
+		if ({{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}) {
+			get{{ pascalCase (getSingularName yml) }}Action({{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }})
+		}
+		else {
+			clear{{ pascalCase (getSingularName yml) }}Action()
+		}
+	}
+
+	get{{ pascalCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}() {
+		const { match } = this.props
+		if (match.params.{{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }} && match.params.{{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }} !== 'new') {
+			return match.params.{{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}
+		}
+		return false
+	}
+
+	handleFormSubmission(values, formActions) {
+		const {
+			history,
+			createOrUpdate{{ pascalCase (getSingularName yml) }}Action
+		} = this.props
+		const {{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }} = this.get{{ pascalCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}()
+		createOrUpdate{{ pascalCase (getSingularName yml) }}Action({{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}, values)
+			.then(() => {
+				history.push('/{{ camelCase (getPluralName yml) }}/')
+			})
+			.catch(() => {
+				formActions.setSubmitting(false)
+			})
+	}
+
+	render() {
+		const { {{ camelCase (getSingularName yml) }} } = this.props
+		const {{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }} = this.get{{ pascalCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }}()
+
+		if (typeof {{ camelCase (getSingularName yml) }} === 'undefined') {
+			return <PageLoading />
+		}
+
+		return (
+			<PageContent className="{{ snakeCase (getPluralName yml) }}_edit" type="narrow">
+				<PageHeader title={({{ camelCase (getSingularName yml) }}{{ pascalCase (getPKey yml) }} ? 'Edit' : 'Add') + ' {{ titleCase (getSingularName yml) }}'} />
+
+				<Formik
+					initialValues=\{{
+						name: {{ camelCase (getSingularName yml) }}.name,
+						date: {{ camelCase (getSingularName yml) }}.date
+					}}
+					enableReinitialize
+					validationSchema={schema}
+					onSubmit={this.handleFormSubmission.bind(this)}
+					render={({
+						isSubmitting,
+						errors,
+					}) => (
+						<Form>
+							{{#each (getFieldsExceptPKey yml)}}
+							<Form.Item
+								label="{{ titleCase @key }}"
+								validateStatus={errors.{{ @key }} ? 'error' : ''}
+								help={errors.{{ @key }} || ''}
+							>
+								<Input name="{{ @key }}" />
+							</Form.Item>
+
+							{{/each}}
+							<Form.Item style=\{{ marginTop: 30 }}>
+								<Button
+									htmlType="submit"
+									type="primary"
+									size="large"
+									disabled={isSubmitting}
+									block
+								>
+									Save Changes
+								</Button>
+								<Link to="/{{ camelCase (getPluralName yml) }}">
+									<Button type="link" block>
+										Cancel all changes and go back
+									</Button>
+								</Link>
+							</Form.Item>
+						</Form>
+					)}
+				/>
+			</PageContent>
+		)
+	}
+}
+
+{{ pascalCase (getSingularName yml) }}Edit.propTypes = {
+	history: PropTypes.shape({
+		push: PropTypes.func.isRequired,
+	}).isRequired,
+	match: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+	get{{ pascalCase (getSingularName yml) }}Action: PropTypes.func.isRequired,
+	clear{{ pascalCase (getSingularName yml) }}Action: PropTypes.func.isRequired,
+	createOrUpdate{{ pascalCase (getSingularName yml) }}Action: PropTypes.func.isRequired,
+	{{ camelCase (getSingularName yml) }}: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+}
+
+{{ pascalCase (getSingularName yml) }}Edit.defaultProps = {
+	{{ camelCase (getSingularName yml) }}: {},
+}
+
+const mapStateToProps = state => ({
+	{{ camelCase (getSingularName yml) }}: state.{{ camelCase (getPluralName yml) }}.{{ camelCase (getSingularName yml) }},
+})
+
+const mapDispatchToProps = dispatch => ({
+	get{{ pascalCase (getSingularName yml) }}Action: get{{ pascalCase (getSingularName yml) }}(dispatch),
+	clear{{ pascalCase (getSingularName yml) }}Action: clear{{ pascalCase (getSingularName yml) }}(dispatch),
+	createOrUpdate{{ pascalCase (getSingularName yml) }}Action: createOrUpdate{{ pascalCase (getSingularName yml) }}(dispatch),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)({{ pascalCase (getSingularName yml) }}Edit)

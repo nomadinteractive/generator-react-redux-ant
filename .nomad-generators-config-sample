@@ -1,22 +1,22 @@
 {
 	"react-redux-ant": {
-		"actions_directory": "output/actions",
-		"reducers_directory": "output/reducers",
-		"screens_directory": "output/screens",
-		"actions_index_file": "output/actions/index.js",
+		"actions_directory": "actions",
+		"reducers_directory": "reducers",
+		"screens_directory": "screens",
+		"actions_index_file": "actions/index.js",
 		"actions_index_new_imports_prepend_pattern": "// $Generator: New Action Export Here",
-		"action_types_file": "output/actions/index.js",
+		"action_types_file": "constants/action_types.js",
 		"action_types_new_constants_prepend_pattern": "// $Generator: New Action Type Constants Here",
-		"api_file": "output/actions/index.js",
+		"api_file": "network-managers/api.js",
 		"api_new_methods_prepend_pattern": "// $Generator: New API Methods Here",
 		"api_methods_exports_prepend_pattern": "\t// $Generator: New API Method Exports Here",
-		"reducers_index_file": "output/reducers/index.js",
+		"reducers_index_file": "reducers/index.js",
 		"reducers_import_prepend_pattern": "// $Generator: New Reducer Import Here",
 		"reducers_export_prepend_pattern": "\t// $Generator: New Combined Reducer Export Here",
-		"navigation_file": "output/screens/shared/header.js",
+		"navigation_file": "screens/shared/header.js",
 		"navigation_links_prepend_pattern": "\t\t\t\t\t\t\t{/* $Generator: New Navigation Menu Link Here */}",
-		"routes_file": "output/routes.js",
-		"routes_prepend_patterns_screen_imports": "// $Generator: New Screens Imports Here",
-		"routes_prepend_patterns_screen_routes": "\t\t\t{/* $Generator: New Screens Routes Here */}"
+		"routes_file": "routes.js",
+		"routes_screen_imports_prepend_pattern": "// $Generator: New Screens Imports Here",
+		"routes_screen_routes_prepend_pattern": "\t\t\t{/* $Generator: New Screens Routes Here */}"
 	}
 }

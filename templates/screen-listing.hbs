@@ -1,0 +1,122 @@
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import {
+	PageHeader,
+	Table,
+	Button,
+	Popconfirm
+} from 'antd'
+
+import {
+	get{{ pascalCase (getPluralName yml) }}List,
+	delete{{ pascalCase (getSingularName yml) }}
+} from '../actions'
+import PageLoading from './shared/page_loading'
+import PageContent from './shared/page_content'
+
+class {{ pascalCase (getPluralName yml) }} extends Component {
+	componentDidMount() {
+		// eslint-disable-next-line no-shadow
+		const { get{{ pascalCase (getPluralName yml) }}ListAction } = this.props
+		get{{ pascalCase (getPluralName yml) }}ListAction()
+	}
+
+	handleDelete{{ pascalCase (getSingularName yml) }}ButtonClick({{ getPKey yml }}) {
+		const {
+			delete{{ pascalCase (getSingularName yml) }}Action,
+			get{{ pascalCase (getPluralName yml) }}ListAction
+		} = this.props
+		delete{{ pascalCase (getSingularName yml) }}Action({{ getPKey yml }})
+			.then(() => {
+				get{{ pascalCase (getPluralName yml) }}ListAction()
+			})
+	}
+
+	render() {
+		const {
+			{{ camelCase (getPluralName yml) }}
+		} = this.props
+
+		if (typeof {{ camelCase (getPluralName yml) }} === 'undefined') {
+			return <PageLoading />
+		}
+
+		return (
+			<PageContent className="{{ snakeCase (getPluralName yml) }}">
+				<PageHeader
+					title="{{ pascalCase (getPluralName yml) }}"
+					extra={(
+						<Link to="/{{ camelCase (getSingularName yml) }}/new">
+							<Button type="primary">
+								Add {{ pascalCase (getSingularName yml) }}
+							</Button>
+						</Link>
+					)}
+				/>
+
+				<Table
+					dataSource={{ curly true }}{{ camelCase (getPluralName yml) }}{{ curly }}
+					rowKey="{{ getPKey yml }}"
+					columns={[
+						{{#each (getFieldsExceptPKey yml)}}
+						{
+							title: '{{ titleCase @key }}',
+							dataIndex: '{{ @key }}',
+							key: '{{ @key }}',
+							{{!-- {{#if (not (isFalsey autoIncrement))}}
+							{{/if}} --}}
+						},
+						{{/each}}
+						{
+							title: 'Actions',
+							key: 'actions',
+							render: (text, record) => (
+								<Button.Group size="small">
+									<Button>
+										<Link to={'/{{ camelCase (getSingularName yml) }}/' + record.{{ getPKey yml }}{{ curly }}>
+											Edit
+										</Link>
+									</Button>
+									<Popconfirm
+										title="Are you sure delete this {{ lowerCase (getSingularName yml) }}?"
+										onConfirm={() => {
+											this.handleDelete{{ pascalCase (getSingularName yml) }}ButtonClick(record.{{ getPKey yml }})
+										}}
+										okText="Yes"
+										cancelText="No"
+									>
+										<Button type="danger" icon="delete" />
+									</Popconfirm>
+								</Button.Group>
+							)
+						}
+					]}
+					pagination={false}
+				/>
+			</PageContent>
+		)
+	}
+}
+
+{{ pascalCase (getPluralName yml) }}.propTypes = {
+	get{{ pascalCase (getPluralName yml) }}ListAction: PropTypes.func.isRequired,
+	{{ camelCase (getPluralName yml) }}: PropTypes.array, // eslint-disable-line react/forbid-prop-types
+}
+
+{{ pascalCase (getPluralName yml) }}.defaultProps = {
+	{{ camelCase (getPluralName yml) }}: [],
+}
+
+const mapStateToProps = state => ({
+	users: state.user.users,
+	{{ camelCase (getPluralName yml) }}: state.{{ camelCase (getPluralName yml) }}.{{ camelCase (getPluralName yml) }},
+})
+
+const mapDispatchToProps = dispatch => ({
+	get{{ pascalCase (getPluralName yml) }}ListAction: get{{ pascalCase (getPluralName yml) }}List(dispatch),
+	delete{{ pascalCase (getSingularName yml) }}Action: delete{{ pascalCase (getSingularName yml) }}(dispatch),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)({{ pascalCase (getPluralName yml) }})

@@ -1,0 +1,27 @@
+import {
+	GET_{{ upperCase (getPluralName yml) }}_LIST_SUCCESS,
+	GET_{{ upperCase (getSingularName yml) }}_SUCCESS,
+} from '../constants/action_types'
+
+const INITIAL_STATE = {
+	{{ camelCase (getPluralName yml) }}: [],
+	{{ camelCase (getSingularName yml) }}: {}
+}
+
+// eslint-disable-next-line import/prefer-default-export
+export const {{ pascalCase (getPluralName yml) }}Reducer = (state = INITIAL_STATE, action) => {
+	switch (action.type) {
+	case GET_{{ upperCase (getPluralName yml) }}_LIST_SUCCESS:
+		return {
+			...state,
+			{{ camelCase (getPluralName yml) }}: action.{{ camelCase (getPluralName yml) }}
+		}
+	case GET_{{ upperCase (getSingularName yml) }}_SUCCESS:
+		return {
+			...state,
+			{{ camelCase (getSingularName yml) }}: action.{{ camelCase (getSingularName yml) }}
+		}
+	default:
+		return state
+	}
+}

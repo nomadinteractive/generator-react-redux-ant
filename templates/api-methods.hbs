@@ -1,0 +1,11 @@
+const get{{ pascalCase (getPluralName yml) }}List = () => getCall('/v1/{{ camelCase (getPluralName yml) }}')
+
+const get{{ pascalCase (getSingularName yml) }} = {{ getPKey yml }} => getCall(`/v1/{{ camelCase (getPluralName yml) }}/${{ curly true }}{{ getPKey yml }}{{ curly }}`)
+
+const create{{ pascalCase (getSingularName yml) }} = values => postCall('/v1/{{ camelCase (getPluralName yml) }}/', values)
+
+const update{{ pascalCase (getSingularName yml) }} = ({{ getPKey yml }}, values) => postCall(`/v1/{{ camelCase (getPluralName yml) }}/${{ curly true }}{{ getPKey yml }}{{ curly }}`, values)
+
+const delete{{ pascalCase (getSingularName yml) }} = {{ getPKey yml }} => deleteCall(`/v1/{{ camelCase (getPluralName yml) }}/${{ curly true }}{{ getPKey yml }}{{ curly }}`)
+
+$1
