@@ -102,6 +102,7 @@ class {{ pascalCase (getPluralName yml) }} extends Component {
 
 {{ pascalCase (getPluralName yml) }}.propTypes = {
 	get{{ pascalCase (getPluralName yml) }}ListAction: PropTypes.func.isRequired,
+	delete{{ pascalCase (getSingularName yml) }}Action: PropTypes.func.isRequired,
 	{{ camelCase (getPluralName yml) }}: PropTypes.array, // eslint-disable-line react/forbid-prop-types
 }
 

@@ -30,14 +30,14 @@ export const get{{ pascalCase (getPluralName yml) }}List = dispatch => () => {
 
 const get{{ pascalCase (getPluralName yml) }}ListSuccess = (dispatch, {{ camelCase (getPluralName yml) }}) => {
 	dispatch({
-		type: GET_{{ upperCase (getSingularName yml) }}_LIST_SUCCESS,
+		type: GET_{{ upperCase (getPluralName yml) }}_LIST_SUCCESS,
 		{{ camelCase (getPluralName yml) }}
 	})
 }
 
 const get{{ pascalCase (getPluralName yml) }}ListFailed = (dispatch) => {
 	dispatch({
-		type: GET_{{ upperCase (getSingularName yml) }}_LIST_FAILED
+		type: GET_{{ upperCase (getPluralName yml) }}_LIST_FAILED
 	})
 }
 
@@ -80,16 +80,20 @@ export const createOrUpdate{{ pascalCase (getSingularName yml) }} = dispatch => 
 	: create{{ pascalCase (getSingularName yml) }}(dispatch)(values)
 )
 
-export const create{{ pascalCase (getSingularName yml) }} = dispatch => values => API.create{{ pascalCase (getSingularName yml) }}(values)
-	.then(response => response.data)
-	.then((/* data */) => {
-		// console.log('data', data)
-		create{{ pascalCase (getSingularName yml) }}Success(dispatch)
-	})
-	.catch(() => {
-		// console.log(error)
-		create{{ pascalCase (getSingularName yml) }}Failed(dispatch)
-	})
+export const create{{ pascalCase (getSingularName yml) }} = dispatch => values => new Promise((resolve, reject) => {
+	API.create{{ pascalCase (getSingularName yml) }}(values)
+		.then(response => response.data)
+		.then((/* data */) => {
+			// console.log('data', data)
+			create{{ pascalCase (getSingularName yml) }}Success(dispatch)
+			resolve()
+		})
+		.catch(() => {
+			// console.log(error)
+			create{{ pascalCase (getSingularName yml) }}Failed(dispatch)
+			reject()
+		})
+})
 
 const create{{ pascalCase (getSingularName yml) }}Success = (dispatch) => {
 	notification.success({
@@ -113,15 +117,19 @@ const create{{ pascalCase (getSingularName yml) }}Failed = (dispatch) => {
 	})
 }
 
-export const update{{ pascalCase (getSingularName yml) }} = dispatch => ({{ getPKey yml }}, values) => API.update{{ pascalCase (getSingularName yml) }}({{ getPKey yml }}, values)
-	.then(response => response.data)
-	.then((/* data */) => {
-		// console.log('data', data)
-		update{{ pascalCase (getSingularName yml) }}Success(dispatch)
-	})
-	.catch(() => {
-		update{{ pascalCase (getSingularName yml) }}Failed(dispatch)
-	})
+export const update{{ pascalCase (getSingularName yml) }} = dispatch => ({{ getPKey yml }}, values) => new Promise((resolve, reject) => {
+	API.update{{ pascalCase (getSingularName yml) }}({{ getPKey yml }}, values)
+		.then(response => response.data)
+		.then((/* data */) => {
+			// console.log('data', data)
+			update{{ pascalCase (getSingularName yml) }}Success(dispatch)
+			resolve()
+		})
+		.catch(() => {
+			update{{ pascalCase (getSingularName yml) }}Failed(dispatch)
+			reject()
+		})
+})
 
 const update{{ pascalCase (getSingularName yml) }}Success = (dispatch) => {
 	notification.success({
