@@ -1,4 +1,4 @@
-# MENS API model and CRUD endpoints generator with "Plop"
+# ReactJS (with Redux) and Ant Design Front-end CRUD generator using PlopJS
 
 See "ployfile.js" for simple breakdown of inputs, actions for the sequalize model generation.
 
@@ -7,7 +7,7 @@ Read more about plop here: https://plopjs.com/
 
 ## Schema YML format
 
-Below a sample API schema that contains all practical features we use on our api endpoints:
+Below a sample CRUD schema (mostly mirroring MENS API generator schema) that contains all practical features we use:
 
 ```yml
 name:
@@ -90,10 +90,10 @@ Review all plopfile.js "modify" type actions and the pattern that are noted in t
 Add the dependency and script to your package.json
 
 devDependencies (or dependencies):
-```"nomad-generator-mens": "git+ssh://git@ship.nomadinteractive.co:nomad-interactive/generator-mens.git"```
+```npm install --save-dev @nomadinteractive/generator-react-redux-ant```
 
 scripts:
-```"generate-crud": "nomad-generator-crud"```
+```"generate-crud": "nomad-generator-react-redux-ant"```
 
 Then, run
 ```npm install```
@@ -119,3 +119,9 @@ You can also send the yml parameter in this command as argument like:
 - [ ] Add feature for list / pagination: true
 - [ ] Add feature for list filter: true
 - [ ] Add feature for list sort: true
+
+
+## License
+
+[MIT](LICENSE.md)
+
